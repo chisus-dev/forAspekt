@@ -1,0 +1,27 @@
+ansible_user: ansible
+ansible_become: true
+ansible_become_method: sudo
+
+admin_users:
+  - name: admin-1
+    groups: sudo
+  - name: admin-2
+    groups: sudo
+  - name: admin-3
+    groups: sudo
+
+technical_users:
+  - name: ansible
+    groups: sudo
+    sudo_nopasswd: true
+  - name: autodeploy
+    groups: docker
+    sudo_nopasswd: false
+
+admin_tools_packages:
+  - mc
+  - ncdu
+  - cifs-utils
+  - nfs-common
+
+docker_package_name: docker.io

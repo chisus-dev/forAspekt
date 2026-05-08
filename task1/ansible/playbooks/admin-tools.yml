@@ -1,0 +1,9 @@
+- name: Install admin tools
+  hosts: task1
+  become: true
+
+  vars_files:
+    - ../vars/packages.yml
+
+  roles:
+    - admin_tools

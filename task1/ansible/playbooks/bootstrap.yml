@@ -1,0 +1,13 @@
+- name: Bootstrap servers
+  hosts: task1
+  become: false
+
+  vars:
+    ansible_user: "{{ bootstrap_user | default('root') }}"
+    ansible_become: "{{ (bootstrap_user | default('root')) != 'root' }}"
+
+  vars_files:
+    - ../vars/users.yml
+
+  roles:
+    - bootstrap

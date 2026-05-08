@@ -1,0 +1,9 @@
+- name: Install and configure Docker
+  hosts: task1
+  become: true
+
+  vars_files:
+    - ../vars/docker.yml
+
+  roles:
+    - docker

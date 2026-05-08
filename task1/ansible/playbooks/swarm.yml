@@ -1,0 +1,6 @@
+- name: Configure Docker Swarm
+  hosts: task1
+  become: true
+
+  roles:
+    - swarm
