@@ -1,0 +1,105 @@
+- name: Install bootstrap packages
+  ansible.builtin.apt:
+    name:
+      - sudo
+      - openssh-server
+      - python3
+    state: present
+    update_cache: true
+
+- name: Ensure required groups exist
+  ansible.builtin.group:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - sudo
+    - docker
+
+- name: Set hostname from inventory
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Create managed users
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    shell: /bin/bash
+    create_home: true
+    groups: "{{ item.groups | default([]) | join(',') if (item.groups | default([]) | length > 0) else omit }}"
+    append: true
+    state: present
+  loop: "{{ managed_users }}"
+
+- name: Add authorized SSH keys
+  ansible.posix.authorized_key:
+    user: "{{ item.name }}"
+    key: "{{ lookup('ansible.builtin.file', ssh_public_keys_dir + '/' + item.name + '.pub') }}"
+    state: present
+    exclusive: true
+  loop: "{{ managed_users }}"
+
+- name: Configure passwordless sudo
+  ansible.builtin.copy:
+    dest: "/etc/sudoers.d/90-{{ item.name }}"
+    content: "{{ item.name }} ALL=(ALL) NOPASSWD:ALL\n"
+    owner: root
+    group: root
+    mode: "0440"
+    validate: "visudo -cf %s"
+  loop: "{{ managed_users }}"
+  when: item.sudo_nopasswd | default(false)
+
+- name: Remove passwordless sudo for users without sudo_nopasswd
+  ansible.builtin.file:
+    path: "/etc/sudoers.d/90-{{ item.name }}"
+    state: absent
+  loop: "{{ managed_users }}"
+  when: not (item.sudo_nopasswd | default(false))
+
+- name: Disable SSH password authentication
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?\\s*PasswordAuthentication\\s+"
+    line: "PasswordAuthentication no"
+    state: present
+    backup: true
+  notify: Restart ssh
+
+- name: Disable SSH keyboard-interactive authentication
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?\\s*KbdInteractiveAuthentication\\s+"
+    line: "KbdInteractiveAuthentication no"
+    state: present
+    backup: true
+  notify: Restart ssh
+
+- name: Disable SSH challenge-response authentication
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?\\s*ChallengeResponseAuthentication\\s+"
+    line: "ChallengeResponseAuthentication no"
+    state: present
+    backup: true
+  notify: Restart ssh
+
+- name: Enable SSH public key authentication
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?\\s*PubkeyAuthentication\\s+"
+    line: "PubkeyAuthentication yes"
+    state: present
+    backup: true
+  notify: Restart ssh
+
+- name: Disable root SSH login
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "^#?\\s*PermitRootLogin\\s+"
+    line: "PermitRootLogin no"
+    state: present
+    backup: true
+  notify: Restart ssh
+
+- name: Validate sshd configuration
+  ansible.builtin.command: sshd -t
+  changed_when: false
