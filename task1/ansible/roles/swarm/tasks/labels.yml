@@ -1,0 +1,38 @@
+- name: Wait until worker nodes are visible in Swarm
+  ansible.builtin.command:
+    argv:
+      - docker
+      - node
+      - inspect
+      - "{{ item }}"
+  loop: "{{ groups['swarm_workers'] }}"
+  register: swarm_worker_node_check
+  changed_when: false
+  retries: 10
+  delay: 3
+  until: swarm_worker_node_check.rc == 0
+
+- name: Check worker node labels
+  ansible.builtin.command:
+    argv:
+      - docker
+      - node
+      - inspect
+      - --format
+      - "{{ '{{' }} index .Spec.Labels \"role\" {{ '}}' }}"
+      - "{{ item }}"
+  loop: "{{ groups['swarm_workers'] }}"
+  register: swarm_worker_label_check
+  changed_when: false
+
+- name: Add role=worker label to worker nodes
+  ansible.builtin.command:
+    argv:
+      - docker
+      - node
+      - update
+      - --label-add
+      - role=worker
+      - "{{ item.item }}"
+  loop: "{{ swarm_worker_label_check.results }}"
+  when: item.stdout != "worker"

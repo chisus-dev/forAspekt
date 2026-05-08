@@ -1,6 +1,25 @@
-- name: Configure Docker Swarm
-  hosts: task1
+- name: Initialize Docker Swarm manager
+  hosts: swarm_managers
   become: true
 
   roles:
-    - swarm
+    - role: swarm
+      tasks_from: manager.yml
+
+
+- name: Join Docker Swarm workers
+  hosts: swarm_workers
+  become: true
+
+  roles:
+    - role: swarm
+      tasks_from: workers.yml
+
+
+- name: Configure Docker Swarm worker labels
+  hosts: swarm_managers
+  become: true
+
+  roles:
+    - role: swarm
+      tasks_from: labels.yml

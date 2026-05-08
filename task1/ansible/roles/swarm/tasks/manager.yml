@@ -1,0 +1,30 @@
+- name: Check Docker Swarm state on manager
+  ansible.builtin.command:
+    argv:
+      - docker
+      - info
+      - --format
+      - "{{ '{{' }}.Swarm.LocalNodeState{{ '}}' }}"
+  register: swarm_manager_state
+  changed_when: false
+
+- name: Initialize Docker Swarm on manager
+  ansible.builtin.command:
+    argv:
+      - docker
+      - swarm
+      - init
+      - --advertise-addr
+      - "{{ ansible_host }}"
+  when: swarm_manager_state.stdout != "active"
+
+- name: Get Docker Swarm worker join token
+  ansible.builtin.command:
+    argv:
+      - docker
+      - swarm
+      - join-token
+      - -q
+      - worker
+  register: swarm_worker_token
+  changed_when: false
