@@ -1,0 +1,66 @@
+containers:
+  t1_01:
+    vm_id: 601
+    hostname: "t1-01"
+    pool: "task1"
+    template_file_id: "local:vztmpl/ubuntu-24.04-standard_24.04-2_amd64.tar.zst"
+
+    cpu_cores: 1
+    memory_mb: 1024
+    swap_mb: 512
+
+    disk_size: 16
+
+    networks:
+      - name: "eth1"
+        bridge: "vmbr20"
+
+    ip_configs:
+      - address: "10.20.0.31/24"
+        gateway: "10.20.0.1"
+
+    ansible_group: "task1"
+
+  t1_02:
+    vm_id: 602
+    hostname: "t1-02"
+    pool: "task1"
+    template_file_id: "local:vztmpl/ubuntu-24.04-standard_24.04-2_amd64.tar.zst"
+
+    cpu_cores: 1
+    memory_mb: 1024
+    swap_mb: 512
+
+    disk_size: 16
+
+    networks:
+      - name: "eth1"
+        bridge: "vmbr20"
+
+    ip_configs:
+      - address: "10.20.0.32/24"
+        gateway: "10.20.0.1"
+
+    ansible_group: "task1"
+
+  t1_03:
+    vm_id: 603
+    hostname: "t1-03"
+    pool: "task1"
+    template_file_id: "local:vztmpl/ubuntu-24.04-standard_24.04-2_amd64.tar.zst"
+
+    cpu_cores: 1
+    memory_mb: 1024
+    swap_mb: 512
+
+    disk_size: 16
+
+    networks:
+      - name: "eth1"
+        bridge: "vmbr20"
+
+    ip_configs:
+      - address: "10.20.0.33/24"
+        gateway: "10.20.0.1"
+
+    ansible_group: "task1"

@@ -1,0 +1,4 @@
+pools:
+  task1:
+    pool_id: "TASK-1"
+    comment: "Aspekt task 1"
