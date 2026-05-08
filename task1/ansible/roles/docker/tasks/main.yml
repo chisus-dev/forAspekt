@@ -1,0 +1,32 @@
+- name: Check Docker package version is configured
+  ansible.builtin.assert:
+    that:
+      - docker_package_version is defined
+      - docker_package_version | length > 0
+      - docker_package_version != "TODO_SET_VERSION"
+    fail_msg: "Set docker_package_version in vars/docker.yml. Use: apt-cache policy docker.io"
+
+- name: Install fixed Docker version
+  ansible.builtin.apt:
+    name: "{{ docker_package_name }}={{ docker_package_version }}"
+    state: present
+    update_cache: true
+
+- name: Hold Docker package version
+  ansible.builtin.dpkg_selections:
+    name: "{{ docker_package_name }}"
+    selection: hold
+
+- name: Ensure Docker service is enabled and started
+  ansible.builtin.service:
+    name: docker
+    enabled: true
+    state: started
+
+- name: Add selected users to docker group
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups:
+      - docker
+    append: true
+  loop: "{{ docker_users }}"
