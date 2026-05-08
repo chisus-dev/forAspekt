@@ -1,0 +1,30 @@
+ssh_public_keys_dir: "{{ playbook_dir }}/../files/ssh_keys"
+
+admin_users:
+  - name: admin-1
+    groups:
+      - sudo
+    sudo_nopasswd: true
+
+  - name: admin-2
+    groups:
+      - sudo
+    sudo_nopasswd: true
+
+  - name: admin-3
+    groups:
+      - sudo
+    sudo_nopasswd: true
+
+technical_users:
+  - name: ansible
+    groups:
+      - sudo
+    sudo_nopasswd: true
+
+  - name: autodeploy
+    groups:
+      - docker
+    sudo_nopasswd: false
+
+managed_users: "{{ admin_users + technical_users }}"

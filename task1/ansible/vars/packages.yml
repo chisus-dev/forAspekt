@@ -1,0 +1,5 @@
+admin_tools_packages:
+  - mc
+  - ncdu
+  - cifs-utils
+  - nfs-common
