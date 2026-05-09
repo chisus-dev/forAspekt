@@ -4,6 +4,7 @@
   gather_facts: false
 
   vars:
+    task3_remote_dir: /opt/foraspekt/task3
     task3_log_dir: /var/log/foraspekt/task3/ubuntu-client
 
   tasks:
@@ -11,6 +12,22 @@
       ansible.builtin.file:
         path: "{{ task3_log_dir }}"
         state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Create task3 scripts directory on worker nodes
+      ansible.builtin.file:
+        path: "{{ task3_remote_dir }}/scripts"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Copy task3 container exec helper to worker nodes
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../../scripts/exec-client.sh"
+        dest: "{{ task3_remote_dir }}/scripts/exec-client.sh"
         owner: root
         group: root
         mode: "0755"
@@ -40,7 +57,7 @@
         dest: "{{ task3_remote_dir }}/compose/docker-compose.yml"
         mode: "0644"
 
-    - name: Copy task3 scripts
+    - name: Copy task3 manager scripts
       ansible.builtin.copy:
         src: "{{ item }}"
         dest: "{{ task3_remote_dir }}/scripts/{{ item | basename }}"
@@ -49,7 +66,7 @@
         - "{{ playbook_dir }}/../../scripts/ensure-networks.sh"
         - "{{ playbook_dir }}/../../scripts/deploy.sh"
         - "{{ playbook_dir }}/../../scripts/remove.sh"
-        - "{{ playbook_dir }}/../../scripts/status.sh" 
+        - "{{ playbook_dir }}/../../scripts/status.sh"
 
     - name: Deploy task3 stack
       ansible.builtin.command:
