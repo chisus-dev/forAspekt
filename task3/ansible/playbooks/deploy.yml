@@ -49,6 +49,7 @@
         - "{{ playbook_dir }}/../../scripts/ensure-networks.sh"
         - "{{ playbook_dir }}/../../scripts/deploy.sh"
         - "{{ playbook_dir }}/../../scripts/remove.sh"
+        - "{{ playbook_dir }}/../../scripts/status.sh" 
 
     - name: Deploy task3 stack
       ansible.builtin.command:
