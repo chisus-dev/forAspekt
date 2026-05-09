@@ -19,9 +19,11 @@
       - node
       - inspect
       - --format
-      - "{{ '{{' }} index .Spec.Labels \"role\" {{ '}}' }}"
-      - "{{ item }}"
-  loop: "{{ groups['swarm_workers'] }}"
+      - "{{ '{{' }} index .Spec.Labels \"{{ item.1.key }}\" {{ '}}' }}"
+      - "{{ item.0 }}"
+  loop: "{{ groups['swarm_workers'] | product(swarm_worker_labels | dict2items) | list }}"
+  loop_control:
+    label: "{{ item.0 }}: {{ item.1.key }}={{ item.1.value }}"
   register: swarm_worker_label_check
   changed_when: false
 
@@ -32,7 +34,9 @@
       - node
       - update
       - --label-add
-      - role=worker
-      - "{{ item.item }}"
+      - "{{ item.item.1.key }}={{ item.item.1.value }}"
+      - "{{ item.item.0 }}"
   loop: "{{ swarm_worker_label_check.results }}"
-  when: item.stdout != "worker"
+  loop_control:
+    label: "{{ item.item.0 }}: {{ item.item.1.key }}={{ item.item.1.value }}"
+  when: item.stdout != item.item.1.value
