@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: task3
+      POSTGRES_PASSWORD: task3
+      POSTGRES_DB: task3
+    networks:
+      db-postgres-net:
+        aliases:
+          - postgres
+    deploy:
+      replicas: 1
+      endpoint_mode: dnsrr
+      placement:
+        constraints:
+          - node.labels.SERVERTYPE == worker
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly no
+    networks:
+      ds-redis-net:
+        aliases:
+          - redis
+    deploy:
+      replicas: 1
+      endpoint_mode: dnsrr
+      placement:
+        constraints:
+          - node.labels.SERVERTYPE == worker
+
+networks:
+  db-postgres-net:
+    external: true
+
+  ds-redis-net:
+    external: true

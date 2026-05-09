@@ -65,6 +65,12 @@
         dest: "{{ task3_remote_dir }}/compose/docker-compose.yml"
         mode: "0644"
 
+    - name: Copy task3 test dependencies compose file
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../../compose/test-dependencies.yml"
+        dest: "{{ task3_remote_dir }}/compose/test-dependencies.yml"
+        mode: "0644"
+
     - name: Copy task3 manager scripts
       ansible.builtin.copy:
         src: "{{ item }}"
@@ -75,6 +81,8 @@
         - "{{ playbook_dir }}/../../scripts/deploy.sh"
         - "{{ playbook_dir }}/../../scripts/remove.sh"
         - "{{ playbook_dir }}/../../scripts/status.sh"
+        - "{{ playbook_dir }}/../../scripts/deploy-test-deps.sh"
+        - "{{ playbook_dir }}/../../scripts/remove-test-deps.sh"
 
     - name: Deploy task3 stack
       ansible.builtin.command:

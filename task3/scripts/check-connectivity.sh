@@ -5,6 +5,8 @@ POSTGRES_HOST="${POSTGRES_HOST:-postgres}"
 POSTGRES_PORT="${POSTGRES_PORT:-5432}"
 REDIS_HOST="${REDIS_HOST:-redis}"
 REDIS_PORT="${REDIS_PORT:-6379}"
+CHECK_RETRIES="${CHECK_RETRIES:-12}"
+CHECK_DELAY="${CHECK_DELAY:-5}"
 LOG_FILE="${LOG_FILE:-/var/log/task3/check.log}"
 
 install_packages() {
@@ -22,6 +24,42 @@ install_packages() {
     netcat-openbsd
 }
 
+check_postgres() {
+  local attempt
+
+  for attempt in $(seq 1 "${CHECK_RETRIES}"); do
+    echo "PostgreSQL attempt ${attempt}/${CHECK_RETRIES}: ${POSTGRES_HOST}:${POSTGRES_PORT}"
+    pg_isready -h "${POSTGRES_HOST}" -p "${POSTGRES_PORT}"
+    local rc=$?
+
+    if [[ "${rc}" -eq 0 ]]; then
+      return 0
+    fi
+
+    sleep "${CHECK_DELAY}"
+  done
+
+  return 1
+}
+
+check_redis() {
+  local attempt
+
+  for attempt in $(seq 1 "${CHECK_RETRIES}"); do
+    echo "Redis attempt ${attempt}/${CHECK_RETRIES}: ${REDIS_HOST}:${REDIS_PORT}"
+    redis-cli -h "${REDIS_HOST}" -p "${REDIS_PORT}" ping
+    local rc=$?
+
+    if [[ "${rc}" -eq 0 ]]; then
+      return 0
+    fi
+
+    sleep "${CHECK_DELAY}"
+  done
+
+  return 1
+}
+
 echo "== Package check =="
 install_packages
 
@@ -31,13 +69,18 @@ echo "HOSTNAME=${HOSTNAME:-unknown}"
 echo "hostname=$(hostname)"
 
 echo
+echo "== DNS check =="
+getent hosts "${POSTGRES_HOST}" || true
+getent hosts "${REDIS_HOST}" || true
+
+echo
 echo "== PostgreSQL check =="
-pg_isready -h "${POSTGRES_HOST}" -p "${POSTGRES_PORT}"
+check_postgres
 POSTGRES_RC=$?
 
 echo
 echo "== Redis check =="
-redis-cli -h "${REDIS_HOST}" -p "${REDIS_PORT}" ping
+check_redis
 REDIS_RC=$?
 
 echo
