@@ -1,0 +1,54 @@
+version: "3.9"
+
+services:
+  ubuntu-client:
+    image: ubuntu:22.04
+    command: sleep infinity
+
+    hostname: "{{.Node.Hostname}}"
+
+    environment:
+      HOSTNAME: "{{.Node.Hostname}}"
+
+    networks:
+      - db-postgres-net
+      - ds-redis-net
+
+    volumes:
+      - /var/log/foraspekt/task3/ubuntu-client:/var/log/task3
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "1"
+
+    deploy:
+      replicas: 2
+
+      placement:
+        constraints:
+          - node.labels.SERVERTYPE == worker
+
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 500M
+
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: start-first
+        failure_action: rollback
+
+      rollback_config:
+        parallelism: 1
+        delay: 10s
+        order: stop-first
+
+networks:
+  db-postgres-net:
+    external: true
+
+  ds-redis-net:
+    external: true
