@@ -16,6 +16,14 @@
         group: root
         mode: "0755"
 
+    - name: Copy connectivity check script to worker log directory
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../../scripts/check-connectivity.sh"
+        dest: "{{ task3_log_dir }}/check-connectivity.sh"
+        owner: root
+        group: root
+        mode: "0755"
+
     - name: Create task3 scripts directory on worker nodes
       ansible.builtin.file:
         path: "{{ task3_remote_dir }}/scripts"
