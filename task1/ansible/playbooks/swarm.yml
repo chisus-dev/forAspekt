@@ -2,24 +2,30 @@
   hosts: swarm_managers
   become: true
 
-  roles:
-    - role: swarm
-      tasks_from: manager.yml
+  tasks:
+    - name: Run Docker Swarm manager tasks
+      ansible.builtin.import_role:
+        name: swarm
+        tasks_from: manager
 
 
 - name: Join Docker Swarm workers
   hosts: swarm_workers
   become: true
 
-  roles:
-    - role: swarm
-      tasks_from: workers.yml
+  tasks:
+    - name: Run Docker Swarm worker tasks
+      ansible.builtin.import_role:
+        name: swarm
+        tasks_from: workers
 
 
 - name: Configure Docker Swarm worker labels
   hosts: swarm_managers
   become: true
 
-  roles:
-    - role: swarm
-      tasks_from: labels.yml
+  tasks:
+    - name: Run Docker Swarm label tasks
+      ansible.builtin.import_role:
+        name: swarm
+        tasks_from: labels
