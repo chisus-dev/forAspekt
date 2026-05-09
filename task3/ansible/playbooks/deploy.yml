@@ -1,0 +1,40 @@
+- name: Deploy task3 Docker Swarm stack
+  hosts: swarm_managers
+  become: true
+  gather_facts: false
+
+  vars:
+    task3_remote_dir: /opt/foraspekt/task3
+
+  tasks:
+    - name: Create task3 remote directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: "0755"
+      loop:
+        - "{{ task3_remote_dir }}"
+        - "{{ task3_remote_dir }}/compose"
+        - "{{ task3_remote_dir }}/scripts"
+
+    - name: Copy task3 compose file
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../../compose/docker-compose.yml"
+        dest: "{{ task3_remote_dir }}/compose/docker-compose.yml"
+        mode: "0644"
+
+    - name: Copy task3 scripts
+      ansible.builtin.copy:
+        src: "{{ item }}"
+        dest: "{{ task3_remote_dir }}/scripts/{{ item | basename }}"
+        mode: "0755"
+      loop:
+        - "{{ playbook_dir }}/../../scripts/ensure-networks.sh"
+        - "{{ playbook_dir }}/../../scripts/deploy.sh"
+        - "{{ playbook_dir }}/../../scripts/remove.sh"
+
+    - name: Deploy task3 stack
+      ansible.builtin.command:
+        cmd: "{{ task3_remote_dir }}/scripts/deploy.sh"
+        chdir: "{{ task3_remote_dir }}"
+      changed_when: true
