@@ -1,3 +1,20 @@
+- name: Prepare task3 host paths on Swarm workers
+  hosts: swarm_workers
+  become: true
+  gather_facts: false
+
+  vars:
+    task3_log_dir: /var/log/foraspekt/task3/ubuntu-client
+
+  tasks:
+    - name: Create task3 log directory on worker nodes
+      ansible.builtin.file:
+        path: "{{ task3_log_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
 - name: Deploy task3 Docker Swarm stack
   hosts: swarm_managers
   become: true
