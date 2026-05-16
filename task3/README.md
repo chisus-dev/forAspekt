@@ -29,7 +29,7 @@ t1-02 — Swarm worker
 t1-03 — Swarm worker
 ```
 
-Настройка выполняется через Ansible и shell-скрипты. Ручные команды в этом README используются только для проверки состояния и интерактивной демонстрации.
+Настройка выполняется через Ansible и shell-скрипты. Ручные команды используются только для проверки состояния и интерактивной демонстрации.
 
 Worker-ноды должны иметь label:
 
@@ -441,12 +441,6 @@ All connectivity checks passed
 
 ```bash
 POSTGRES_HOST=<real_postgres_name> REDIS_HOST=<real_redis_name> /var/log/task3/check-connectivity.sh
-```
-
-В команде нужно указывать реальные значения без угловых скобок. Например:
-
-```bash
-POSTGRES_HOST=db REDIS_HOST=redis-cache /var/log/task3/check-connectivity.sh
 ```
 
 ## Проверка host-visible логов
