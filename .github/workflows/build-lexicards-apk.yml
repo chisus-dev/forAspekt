@@ -7,6 +7,10 @@ on:
     paths:
       - 'vocab-cards/**'
       - '.github/workflows/build-lexicards-apk.yml'
+  pull_request:
+    paths:
+      - 'vocab-cards/**'
+      - '.github/workflows/build-lexicards-apk.yml'
   workflow_dispatch:
 
 jobs:
