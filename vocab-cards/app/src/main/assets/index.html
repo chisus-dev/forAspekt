@@ -7,11 +7,13 @@
   <title>LexiCards</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="patch-v3.css">
+  <link rel="stylesheet" href="patch-v4.css">
 </head>
 <body>
   <div id="app">
     <header class="app-header">
       <div><p class="eyebrow">Личный словарь</p><h1 id="pageTitle">Карточки</h1></div>
+      <button id="settingsButton" class="settings-button" type="button" aria-label="Настройки" title="Настройки">⚙</button>
     </header>
     <main>
       <section class="page active" data-page="cards">
@@ -19,6 +21,7 @@
         <div class="search-wrap"><span class="search-icon">⌕</span><input id="cardSearch" class="search-input" type="search" placeholder="Найти слово или перевод" autocomplete="off"></div>
         <div id="cardList" class="card-list"></div>
       </section>
+
       <section class="page" data-page="editor">
         <form id="cardForm" novalidate>
           <input id="editId" type="hidden">
@@ -29,22 +32,50 @@
             <div id="existingExampleSuggestions" class="suggestions hidden"></div>
           </div>
           <div class="section-heading"><div><h2>Переводы</h2><p>Каждый вариант отслеживается отдельно.</p></div><button id="addTranslationButton" class="compact-button" type="button">+ Добавить</button></div>
-          <div id="translationList" class="stack"></div><p id="translationError" class="field-error hidden"></p>
-          <div class="section-heading"><div><h2>Примеры</h2><p>Пример можно привязать к нужному значению.</p></div><button id="addExampleButton" class="compact-button" type="button">+ Добавить</button></div>
+          <div id="translationList" class="stack"></div>
+          <p id="translationError" class="field-error hidden"></p>
+          <div class="section-heading"><div><h2>Примеры</h2><p>Один пример можно привязать к нескольким значениям.</p></div><button id="addExampleButton" class="compact-button" type="button">+ Добавить</button></div>
           <div id="exampleList" class="stack"></div>
           <div class="editor-actions"><button id="cancelEditButton" class="secondary-button" type="button">Очистить</button><button class="primary-button" type="submit">Сохранить карточку</button></div>
         </form>
       </section>
+
       <section class="page" data-page="study"><div id="studyContent"></div></section>
+
+      <section class="page" data-page="settings">
+        <div class="settings-stack">
+          <div class="surface settings-card">
+            <h2>Резервная копия</h2>
+            <p>Сохраните карточки, примеры, связи между значениями и расписание повторений в один JSON-файл.</p>
+            <div id="backupSummary" class="backup-summary"></div>
+            <div class="settings-actions">
+              <button id="exportBackupButton" class="primary-button" type="button">Выгрузить бэкап</button>
+              <button id="importBackupButton" class="secondary-button" type="button">Восстановить из файла</button>
+            </div>
+            <div id="backupStatus" class="backup-status"></div>
+            <input id="backupFileInput" class="hidden" type="file" accept="application/json,.json">
+          </div>
+          <div class="settings-note">При восстановлении текущий словарь на устройстве заменяется содержимым выбранного файла. Перед переносом данных рекомендуется сначала выгрузить свежую копию.</div>
+        </div>
+      </section>
     </main>
+
     <nav class="bottom-nav">
       <button class="nav-item active" type="button" data-nav="cards"><span class="nav-icon">▤</span><span>Карточки</span></button>
       <button class="nav-item" type="button" data-nav="editor"><span class="nav-icon nav-plus">＋</span><span>Добавить</span></button>
       <button class="nav-item" type="button" data-nav="study"><span class="nav-icon">◆</span><span>Учить</span></button>
     </nav>
   </div>
+
   <div id="toast" class="toast" role="status"></div>
-  <div id="modalBackdrop" class="modal-backdrop hidden"><div class="modal"><h3 id="modalTitle"></h3><p id="modalText"></p><div id="modalActions" class="modal-actions"></div></div></div>
-  <script src="app-v3.js"></script>
+  <div id="modalBackdrop" class="modal-backdrop hidden">
+    <div class="modal">
+      <h3 id="modalTitle"></h3>
+      <div id="modalText" class="modal-text"></div>
+      <div id="modalActions" class="modal-actions"></div>
+    </div>
+  </div>
+
+  <script src="app-v4.js"></script>
 </body>
 </html>
